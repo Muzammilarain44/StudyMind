@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -12,6 +13,13 @@ import Planner from './pages/Planner.jsx';
 import Quizzes from './pages/Quizzes.jsx';
 import Flashcards from './pages/Flashcards.jsx';
 import Pomodoro from './pages/Pomodoro.jsx';
+import Gpa from './pages/Gpa.jsx';
+import Settings from './pages/Settings.jsx';
+import Admin from './pages/Admin.jsx';
+
+// Analytics pulls in Recharts (~450 kB), so it is code-split: the charts
+// chunk loads only when the Analytics page is visited.
+const Analytics = lazy(() => import('./pages/Analytics.jsx'));
 
 function NotFound() {
   return (
@@ -39,6 +47,17 @@ export default function App() {
           <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/pomodoro" element={<Pomodoro />} />
+          <Route path="/gpa" element={<Gpa />} />
+          <Route
+            path="/analytics"
+            element={
+              <Suspense fallback={<p className="text-sm text-slate-500">Loading analytics…</p>}>
+                <Analytics />
+              </Suspense>
+            }
+          />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
