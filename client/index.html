@@ -4,7 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="StudyMind — a student learning workspace. Courses, notes, planner, quizzes, flashcards, Pomodoro, GPA and analytics." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E" />
     <title>StudyMind — Student Learning Workspace</title>
+    <!-- Apply the saved theme before first paint so dark-mode users never
+         see a white flash while React loads (Phase 6). -->
+    <script>
+      try {
+        if (localStorage.getItem('studymind-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -7,7 +7,7 @@
     "react-router-dom": "^6.28.0",
     "recharts": "^3.10.1"
   },
-  "description": "StudyMind frontend — Vite + React (Phase 5: GPA, analytics, settings, admin)",
+  "description": "StudyMind frontend — Vite + React (Phase 6: polish & QA — final phase)",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -30,5 +30,5 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "0.5.0"
+  "version": "0.6.0"
 }
