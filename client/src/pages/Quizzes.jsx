@@ -252,7 +252,7 @@ export default function Quizzes() {
             <div>
               <h2 className="text-lg font-semibold">{taking.title}</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {taking.questions.length} questions
+                {taking.questions.length} question{taking.questions.length === 1 ? '' : 's'}
                 {taking.timeLimitSeconds ? ` · ${Math.round(taking.timeLimitSeconds / 60)} minute timer` : ' · No timer'}
               </p>
             </div>

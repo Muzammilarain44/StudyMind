@@ -23,7 +23,7 @@ const COMMON_TIMEZONES = [
 ];
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const navigate = useNavigate();
   const [theme, setTheme] = useState(user?.theme || 'light');
   const [timezone, setTimezone] = useState(user?.timezone || 'Asia/Karachi');
@@ -45,6 +45,9 @@ export default function Settings() {
     try {
       await settingsApi.update({ theme, timezone });
       applyTheme(theme);
+      // Refresh the auth context so Profile (and the Layout theme toggle)
+      // show the new values immediately — no page reload needed.
+      await refresh();
       setMessage('Preferences saved.');
     } catch (err) {
       setError(err.message || 'Could not save preferences.');

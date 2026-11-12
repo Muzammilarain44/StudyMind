@@ -25,12 +25,12 @@ export default function Home() {
           </Link>
         </div>
         <p className="mt-4 text-xs text-indigo-200">
-          Phase 2: auth is live. Courses, notes and the rest arrive in later phases.
+          Free to use — register, add a course, and your workspace is ready.
         </p>
       </section>
 
       <section aria-label="Features">
-        <h2 className="text-2xl font-bold">What StudyMind will do</h2>
+        <h2 className="text-2xl font-bold">What StudyMind does</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {FEATURES.map((f) => (
             <article key={f.title} className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">

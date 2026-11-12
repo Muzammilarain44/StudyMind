@@ -149,9 +149,9 @@ export default function Analytics() {
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.daily} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
-                  <YAxis allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} interval="preserveStartEnd" />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                   <Tooltip />
                   <Bar dataKey="focusMinutes" name="Focus minutes" fill="#4f46e5" />
                 </BarChart>
@@ -165,9 +165,9 @@ export default function Analytics() {
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.daily} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
-                  <YAxis allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} interval="preserveStartEnd" />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="tasksCompleted" name="Tasks completed" fill="#16a34a" />
@@ -186,9 +186,9 @@ export default function Analytics() {
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data.daily} margin={{ top: 4, right: 8, bottom: 4, left: -16 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
-                  <YAxis domain={[0, 100]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} interval="preserveStartEnd" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#94a3b8" }} />
                   <Tooltip />
                   <Line
                     type="monotone"

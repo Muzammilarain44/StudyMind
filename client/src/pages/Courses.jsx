@@ -93,7 +93,7 @@ export default function Courses() {
   }
 
   async function handleDelete(course) {
-    if (!window.confirm(`Delete the course "${course.title}"? Its notes and tasks keep their course link cleared only if you remove them first — deleting a course does not delete your notes or tasks.`)) {
+    if (!window.confirm(`Delete the course "${course.title}"? Your notes and tasks stay, but their link to this course will be cleared.`)) {
       return;
     }
     setDeletingId(course._id);

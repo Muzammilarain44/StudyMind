@@ -8,7 +8,7 @@ const GRADES = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F'];
 const emptyForm = { title: '', semester: '', grade: 'A', courseId: '', creditHours: '' };
 
 export default function Gpa() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const [records, setRecords] = useState([]);
   const [compute, setCompute] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -131,6 +131,7 @@ export default function Gpa() {
       const result = await settingsApi.update({ gradingScale: scale });
       setScale(result.user.gradingScale);
       setScaleMessage('Grading scale saved. Your GPA was re-computed with the new scale.');
+      await refresh();
       await load();
     } catch (err) {
       setScaleMessage(err.message || 'Could not save the scale.');
