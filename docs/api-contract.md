@@ -1,4 +1,4 @@
-# StudyMind — API Contract (Phase 3)
+# StudyMind — API Contract (Phase 4)
 
 Base prefix for versioned endpoints: `/api/v1`. The health endpoint is also
 available unversioned at `/api/health` for deployment checks.
@@ -145,15 +145,107 @@ user's own stored data only:
 ```
 
 Overdue = incomplete with `dueDate` before now. "Due today / next 7 days" count
-incomplete tasks only. No study-time or quiz fields exist yet — they are not
-invented; they arrive in Phases 4–5.
+incomplete tasks only. Phase 4 adds real study numbers from stored data:
+
+```json
+{
+  "studyStreakDays": 3,
+  "focusMinutesToday": 25,
+  "totalFocusMinutes": 150,
+  "quizzesTaken": 4,
+  "averageQuizPercentage": 72
+}
+```
+
+`studyStreakDays` is consecutive days (ending today, or yesterday if today has
+no activity yet) with at least 1 completed task, 1 completed Pomodoro focus
+session, or 1 quiz attempt. `averageQuizPercentage` is `null` when no quiz has
+been attempted yet.
+
+## Quizzes, flashcards, Pomodoro — `/api/v1/*` (Phase 4, real)
+
+Same auth (401 without a valid session) and ownership rules as Phase 3:
+another user's document behaves as if it does not exist (**404**). All routes
+return **503** when MongoDB is down. List endpoints are paginated as above.
+
+### Quizzes — `/api/v1/quizzes`
+
+Quiz: `{ "_id", "userId", "title" (≤120), "description" (≤500, optional),
+"courseId" (nullable), "timeLimitSeconds" (10–14400, optional, null = no timer),
+"questions" (1–100), "archived" (default false), "createdAt", "updatedAt" }`.
+Question: `{ "question" (≤500), "options" (2–6, each ≤200), "correctIndex"
+(points at exactly one option), "explanation" (≤1000, optional) }`.
+
+- `GET /api/v1/quizzes` — `?courseId`, `?search` (title substring), `?archived`.
+  The list returns `questionCount` instead of the questions array.
+- `POST /api/v1/quizzes` — **201** `{ "quiz" }`.
+- `GET /api/v1/quizzes/stats` — **200** `{ "totalQuizzes", "totalAttempts",
+  "averagePercentage", "bestPercentage", "byCourse": [{ "courseId", "courseTitle",
+  "quizzes", "attempts", "averagePercentage" }] }`. `?courseId` narrows to one course.
+  Averages are `null` when there are no attempts yet.
+- `GET /api/v1/quizzes/:id` — **200** `{ "quiz" }` (full quiz, with questions), else 404.
+- `PUT /api/v1/quizzes/:id` — partial update. **200** `{ "quiz" }`.
+- `DELETE /api/v1/quizzes/:id` — **200** `{ "ok": true }`. Also deletes its attempts.
+- `POST /api/v1/quizzes/:id/attempts` — body `{ "answers" (one option index per
+  question, in order), "timeTakenSeconds" (optional) }`. Graded server-side.
+  **201** `{ "attempt": { "score", "total", "percentage", ... }, "results": [{
+  "questionIndex", "question", "selected", "correctIndex", "correct",
+  "explanation" }] }`. Wrong answer count → 400; out-of-range answer → 400.
+- `GET /api/v1/quizzes/:id/attempts` — attempt history, newest first.
+
+### Flashcard decks — `/api/v1/flashcard-decks`
+
+Deck: `{ "_id", "userId", "title" (≤120), "description" (≤500, optional),
+"courseId" (nullable), "createdAt", "updatedAt" }`. Card: `{ "_id", "userId",
+"deckId", "front" (≤1000), "back" (≤2000), "createdAt", "updatedAt" }`.
+Review: `{ "_id", "userId", "cardId", "deckId", "rating" ("again" | "hard" |
+"good" | "easy"), "intervalDays", "nextDue", "reviewedAt" }`.
+
+- `GET /api/v1/flashcard-decks` — `?courseId`. Each deck includes `cardCount`.
+- `POST /api/v1/flashcard-decks` — **201** `{ "deck" }`.
+- `GET /api/v1/flashcard-decks/:id` — **200** `{ "deck" }` (with `cardCount`), else 404.
+- `PUT /api/v1/flashcard-decks/:id` — partial update. **200** `{ "deck" }`.
+- `DELETE /api/v1/flashcard-decks/:id` — **200** `{ "ok": true }`. Also deletes its cards and reviews.
+- `GET /api/v1/flashcard-decks/:id/cards` — list cards in the deck.
+- `POST /api/v1/flashcard-decks/:id/cards` — **201** `{ "card" }`.
+- `GET /api/v1/flashcard-decks/:id/due` — **200** `{ "deckId", "dueCount",
+  "cards": [...] }`: cards never reviewed, or whose latest review's `nextDue`
+  has passed. New cards first, then most overdue. `?limit` (default 20, max 100).
+- `PUT /api/v1/flashcard-decks/:id/cards/:cardId` — partial update. **200** `{ "card" }`.
+- `DELETE /api/v1/flashcard-decks/:id/cards/:cardId` — **200** `{ "ok": true }`. Also deletes its reviews.
+- `POST /api/v1/flashcard-decks/:id/cards/:cardId/review` — body `{ "rating" }`.
+  Applies the SM-2-lite schedule (see `docs/architecture.md`): new card rated
+  "good" → 3 days, "easy" → 7 days, "again" → 1 day. **201** `{ "review", "card" }`.
+  Bad rating → 400.
+- `GET /api/v1/flashcard-decks/:id/cards/:cardId/reviews` — review history, newest first.
+
+### Study sessions (Pomodoro) — `/api/v1/study-sessions`
+
+Session: `{ "_id", "userId", "type" ("focus" | "break"), "plannedMinutes" (1–240),
+"actualMinutes" (nullable until completed), "status" ("active" | "completed" |
+"abandoned"), "clientKey", "startedAt", "completedAt" (nullable), "createdAt",
+"updatedAt" }`.
+
+- `POST /api/v1/study-sessions` — body `{ "type" (default "focus"),
+  "plannedMinutes" (default 25), "clientKey" (required) }`. Idempotent on
+  `clientKey`: a retry returns the existing session with **200**
+  `{ "session", "duplicate": true }` instead of creating a duplicate.
+  New session → **201** `{ "session", "duplicate": false }`.
+- `GET /api/v1/study-sessions` — `?status`, `?type`, pagination. Newest first.
+- `GET /api/v1/study-sessions/summary` — **200** `{ "completedFocusSessions",
+  "totalFocusMinutes", "focusMinutesToday", "focusSessionsToday",
+  "activeSession" (or null) }`.
+- `POST /api/v1/study-sessions/:id/complete` — body `{ "actualMinutes" (optional,
+  defaults to plannedMinutes) }`. **200** `{ "session" }`. Completing a session
+  that is already completed or abandoned → **409**.
+- `POST /api/v1/study-sessions/:id/abandon` — **200** `{ "session" }`. Only an
+  active session can be abandoned (otherwise **409**).
 
 ## Unknown routes
 
 `GET /api/<anything-else>` → HTTP 404, `{ "error": "Not found" }`.
 
-## Future endpoints (Phases 4–6, not implemented)
+## Future endpoints (Phases 5–6, not implemented)
 
 See `docs/phase-0-design-feasibility.md` §7 for the remaining endpoint plan
-(`/quizzes`, `/flashcard-decks`, `/study-sessions`, `/gpa-records`,
-`/analytics/overview`, `/admin/subjects`).
+(`/gpa-records`, `/analytics/overview`, `/admin/subjects`).
