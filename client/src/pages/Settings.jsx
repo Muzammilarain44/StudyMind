@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { downloadExport, settingsApi } from '../lib/api.js';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 import { applyTheme } from '../lib/theme.js';
 import { btnDanger, btnGhost, btnPrimary, cardCls, inputCls, labelCls, selectCls } from '../lib/ui-classes.js';
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { coursesApi, gpaApi, settingsApi } from '../lib/api.js';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 import { btnDanger, btnGhost, btnPrimary, cardCls, inputCls, labelCls, selectCls } from '../lib/ui-classes.js';
 
 const GRADES = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F'];

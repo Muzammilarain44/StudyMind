@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 
 export default function Profile() {
   const { user, logout, changePassword } = useAuth();

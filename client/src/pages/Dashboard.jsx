@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { dashboardApi, fetchHealth } from '../lib/api.js';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 import { cardCls } from '../lib/ui-classes.js';
 
 function Stat({ label, value, to }) {

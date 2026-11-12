@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { adminApi } from '../lib/api.js';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 import { btnDanger, btnGhost, btnPrimary, cardCls, inputCls, labelCls, selectCls, textareaCls } from '../lib/ui-classes.js';
 
 const emptySubject = { title: '', code: '', category: 'Computer Science', description: '' };
