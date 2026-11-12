@@ -51,6 +51,9 @@ export default function Layout() {
         { to: '/courses', label: 'Courses' },
         { to: '/notes', label: 'Notes' },
         { to: '/planner', label: 'Planner' },
+        { to: '/quizzes', label: 'Quizzes' },
+        { to: '/flashcards', label: 'Flashcards' },
+        { to: '/pomodoro', label: 'Pomodoro' },
         { to: '/profile', label: 'Profile' },
       ]
     : [
@@ -114,7 +117,7 @@ export default function Layout() {
                 </button>
               )}
               <p className="px-2 pt-4 text-xs leading-relaxed text-slate-400">
-                Quizzes, flashcards and Pomodoro arrive in Phase 4; GPA and analytics in Phase 5.
+                GPA and analytics arrive in Phase 5.
               </p>
             </nav>
           </aside>
