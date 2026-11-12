@@ -6,7 +6,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"
   },
-  "description": "StudyMind frontend \u2014 Vite + React (Phase 3: courses, notes, tasks)",
+  "description": "StudyMind frontend — Vite + React (Phase 4: quizzes, flashcards, Pomodoro)",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -29,5 +29,5 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "0.3.0"
+  "version": "0.4.0"
 }
