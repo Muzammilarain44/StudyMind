@@ -1,4 +1,4 @@
-# StudyMind — Architecture (Phase 5)
+# StudyMind — Architecture (Phase 6 — final)
 
 ## Overview
 
@@ -180,3 +180,44 @@ sessions do not count toward the streak.
   copy a sample into their own quizzes (`POST /admin/sample-quizzes/:id/copy`).
 - `scripts/seed-samples.js <admin-email>` seeds 5 curated CS subjects and 2
   sample quizzes. It is idempotent: re-running it creates nothing new.
+
+## Polish & QA (Phase 6 — final)
+
+- **Responsive:** the top bar and the mobile bottom bar both scroll
+  horizontally instead of overflowing — at 1280px the 13-link top bar used
+  to push the theme toggle 20px past the viewport edge; the mobile bar holds
+  the same 13 links by scrolling. Every page was checked at 1280px and
+  390px in a real browser (no horizontal overflow on either).
+- **Dark mode:** applied before first paint by an inline script in
+  `client/index.html` (reads `localStorage`, adds `.dark`), so dark-mode
+  users never see a white flash. Charts use a slate tick/grid colour that
+  reads on both themes.
+- **Accessibility:** a global `:focus-visible` outline in `index.css`
+  (Tailwind's preflight removes outlines); all inputs have labels, dialogs
+  use `window.confirm`, timers/flip-cards/progress bars carry `role` and
+  `aria-label`/`aria-pressed`/`aria-valuenow`.
+- **Auth context refresh:** `useAuth()` exposes `refresh()`, which re-reads
+  `/auth/me`. Settings and GPA call it after saving, so Profile shows the
+  new theme/timezone/scale immediately (Phase 5 needed a reload).
+- **Course delete integrity:** deleting a course clears `courseId` to `null`
+  on the owner's notes, tasks, quizzes, flashcard decks and GPA records
+  instead of leaving orphaned references to a deleted course. Nothing the
+  user wrote is deleted.
+- **Date validation:** invalid `dueBefore`/`dueAfter` on `GET /tasks` is a
+  400 with a clear message (it used to fall through to a CastError → 404).
+- **Security audit (Phase 6):** every router except `common.js` (helpers)
+  applies `requireAuth`; all `$regex` searches escape user input; no
+  `eval`/`Function`/`$where`; the only `dangerouslySetInnerHTML` is the
+  Notes Markdown preview, sanitized with DOMPurify; cookies are HttpOnly,
+  `sameSite: 'lax'`, `secure` in production; production refuses to start
+  without a ≥32-char `JWT_SECRET`; no `.env` or secret is committed
+  (verified by grep); Helmet + CORS allowlist + rate limits (300/15 min
+  API-wide, 10/15 min on register/login) are on in `app.js`.
+- **Performance:** main bundle 359.54 kB (gzip 106.28 kB), Analytics chunk
+  418.93 kB (gzip 120.34 kB, lazy-loaded) — unchanged from Phase 5; no new
+  dependencies in Phase 6.
+- **End-to-end:** the full user journey was driven in a real headless
+  Chromium against the built client + real server (45/45 checks pass — see
+  `docs/test-checklist.md`). The *deployed* end-to-end test is still
+  **blocked** on deployment (Atlas/Render/Vercel manual steps in
+  `docs/setup.md`); no live URL exists yet and none is claimed.

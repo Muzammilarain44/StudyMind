@@ -1,15 +1,57 @@
-# StudyMind — Test Checklist (Phase 5)
+# StudyMind — Test Checklist (Phase 6 — final)
 
 ## Automated (run before every commit)
 
-- [ ] `cd server && npm test` — all tests pass (4 health + 9 auth + 14 Phase 3
-      + 17 Phase 4 + 12 Phase 5: GPA compute/scale/validation/ownership,
-      analytics totals/date filters, settings validation, export scoping,
-      account deletion, admin 403s, subjects, sample quizzes, stats).
-- [ ] `cd server && npm run lint` — no syntax errors (`node --check`).
-- [ ] `cd client && npm run lint` — ESLint passes.
-- [ ] `cd client && npm run build` — Vite build passes, `dist/` is produced.
-- [ ] GitHub Actions CI is green on the push/PR.
+- [x] `cd server && npm test` — all tests pass (4 health + 9 auth + 14 Phase 3
+      + 17 Phase 4 + 12 Phase 5 + 3 Phase 6 = **59 tests**: course-delete link
+      cleanup, other-user course delete 404, invalid task date filters 400).
+- [x] `cd server && npm run lint` — no syntax errors (`node --check`).
+- [x] `cd client && npm run lint` — ESLint passes (0 errors; 1 pre-existing
+      `auth.jsx` react-refresh warning from Phase 2, untouched).
+- [x] `cd client && npm run build` — Vite build passes, `dist/` is produced.
+      Main bundle 359.56 kB (gzip 106.29 kB); Analytics chunk 418.93 kB
+      (gzip 120.34 kB, lazy-loaded) — unchanged from Phase 5.
+- [ ] GitHub Actions CI is green on the push/PR. *(Unverified until the
+      Phase 6 files are pushed — the workflow itself is unchanged.)*
+
+## Local end-to-end (browser) — Phase 6, run 2026-11-12
+
+Real headless Chromium (Playwright) against the **built** client
+(`vite preview` :5173) + the real server backed by in-memory MongoDB.
+Full journey, **45/45 checks PASS**, zero console errors, zero failed
+requests (expected pre-login `/auth/me` 401 and student `/admin/stats` 403
+probes excluded — the app handles both):
+
+- Register via UI → Dashboard; create course; note autosave shows
+  "✓ Saved"; create + complete task; create quiz → take → graded **1/1**;
+  deck + card → study → flip → rate Good → "Queue clear"; Pomodoro start →
+  Finish now → break auto-starts → history; GPA record → compute **4.00**;
+  analytics charts render real data; dashboard shows real data;
+  Settings dark save → Profile shows "dark" **without reload** (Phase 5
+  issue fixed); export JSON downloads own data only; logout → login.
+- No horizontal overflow on any of 14 desktop pages (1280px) or 11 mobile
+  pages (390px). Mobile bottom nav (13 links) scrolls horizontally.
+- Keyboard Tab moves focus (logo → Home …). Screenshots saved in
+  `docs/screenshots/` and visually checked (dashboard light + dark, courses,
+  quiz result, Pomodoro, mobile dashboard + courses).
+
+## Security audit (Phase 6)
+
+- [x] Every router except `common.js` (helpers) applies `requireAuth`;
+      admin routes additionally enforce the server-side role.
+- [x] All `$regex` searches escape user input (`escapeRegExp`); no
+      `eval`/`new Function`/`$where` anywhere; the only
+      `dangerouslySetInnerHTML` is the Notes Markdown preview, sanitized
+      with DOMPurify.
+- [x] Cookies: HttpOnly, `sameSite: 'lax'`, `secure` in production; 7-day
+      expiry. Production refuses to start without a ≥32-char `JWT_SECRET`.
+- [x] No `.env` or secret anywhere in the tree (grep clean); `.env.example`
+      files hold placeholders only; `.gitignore` covers `.env` and `dist/`.
+- [x] Helmet + CORS allowlist + rate limits in `app.js` (300/15 min
+      API-wide; 10/15 min on register/login).
+- [x] Two fixes from the audit: course delete now clears `courseId` links
+      (was orphaned references); invalid `dueBefore`/`dueAfter` is 400
+      (was CastError → 404).
 
 ## Manual — local
 
@@ -58,7 +100,12 @@
 - [ ] Forms are usable with the on-screen keyboard; inputs are not covered by the bottom nav.
 - [ ] Dark mode toggle is reachable.
 
-### Deployed (only after local checks pass)
+### Deployed (BLOCKED — only after the manual Atlas/Render/Vercel steps in `docs/setup.md`)
+
+No deployment exists yet, so none of these could be run in Phase 6 — the
+local browser run above is the end-to-end evidence so far. Do not claim a
+live URL until these pass:
+
 - [ ] Render health URL returns 200 + `db: "connected"`.
 - [ ] Vercel site loads; Dashboard shows the live Render health status.
 - [ ] After 15+ minutes idle, the first Dashboard load shows the loading state and

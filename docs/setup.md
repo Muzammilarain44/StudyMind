@@ -1,4 +1,4 @@
-# StudyMind — Setup (Phase 5)
+# StudyMind — Setup (Phase 6 — final)
 
 ## Prerequisites
 
@@ -45,7 +45,17 @@ Copy the `.env.example` files and fill in your own values. Never commit a real `
 Auth, courses, notes and tasks all need a database: they return 503 while
 MongoDB is down. For local testing without Atlas, the server test suite uses
 an in-memory MongoDB (`mongodb-memory-server`, dev-only) — see
-`server/test/phase5.test.js`. Phase 5 adds no new environment variables.
+`server/test/phase6.test.js`. Phase 6 adds no new environment variables.
+
+## Browser QA (Phase 6)
+
+Phase 6 was verified in a real headless Chromium (Playwright) against the
+built client + a real server backed by in-memory MongoDB — see
+`docs/test-checklist.md` for the 45-check run and `docs/demo-script.md` for
+the click-by-click demo. Screenshots from that run live in
+`docs/screenshots/` (desktop + phone, light + dark). To repeat it locally,
+run the server with a database, build the client (`npm run build`), serve it
+(`npm run preview -- --port 5173`), and walk `docs/demo-script.md`.
 
 ## Admin access and sample content (Phase 5)
 

@@ -1,4 +1,4 @@
-# StudyMind — API Contract (Phase 5)
+# StudyMind — API Contract (Phase 6 — final)
 
 Base prefix for versioned endpoints: `/api/v1`. The health endpoint is also
 available unversioned at `/api/health` for deployment checks.
@@ -101,7 +101,7 @@ Course: `{ "_id", "userId", "title" (≤120), "code" (≤20, optional),
 - `POST /api/v1/courses` — **201** `{ "course" }`. Title and semester required.
 - `GET /api/v1/courses/:id` — **200** `{ "course" }`, else 404.
 - `PUT /api/v1/courses/:id` — partial update (archive/unarchive via `{ "archived": true/false }`). **200** `{ "course" }`.
-- `DELETE /api/v1/courses/:id` — **200** `{ "ok": true }`. Does not delete notes/tasks.
+- `DELETE /api/v1/courses/:id` — **200** `{ "ok": true }`. Does not delete notes/tasks — their `courseId` link is cleared to `null` instead (Phase 6), so nothing the user wrote is lost.
 
 ### Notes — `/api/v1/notes`
 
@@ -122,7 +122,7 @@ Task: `{ "_id", "userId", "courseId" (nullable), "title" (≤200),
 ("low" | "medium" | "high", default "medium"), "completed",
 "completedAt" (nullable), "createdAt", "updatedAt" }`.
 
-- `GET /api/v1/tasks` — `?completed`, `?courseId`, `?priority`, `?dueBefore`, `?dueAfter` (ISO dates).
+- `GET /api/v1/tasks` — `?completed`, `?courseId`, `?priority`, `?dueBefore`, `?dueAfter` (ISO dates). An invalid `dueBefore`/`dueAfter` value is **400** (Phase 6 — it used to fall through to a CastError → 404).
 - `POST /api/v1/tasks` — **201** `{ "task" }`. Creating with `completed: true` stamps `completedAt`.
 - `GET /api/v1/tasks/:id` — **200** `{ "task" }`, else 404.
 - `PUT /api/v1/tasks/:id` — partial update. `completed: true` stamps `completedAt`; `completed: false` clears it. **200** `{ "task" }`.
@@ -342,6 +342,9 @@ self-registration — see `docs/setup.md` for the promotion script.
 
 `GET /api/<anything-else>` → HTTP 404, `{ "error": "Not found" }`.
 
-## Future endpoints (Phase 6, not implemented)
+## Phase 6 — polish & QA (done, no new endpoints)
 
-Phase 6 adds no new endpoints — it is polish and QA on the deployed app.
+Phase 6 added no new endpoints. It fixed two behaviours (course-delete link
+cleanup, invalid task date filters → 400 — see above), audited the whole app
+in a real browser (see `docs/test-checklist.md`), and added
+`docs/demo-script.md` plus screenshots in `docs/screenshots/`.
