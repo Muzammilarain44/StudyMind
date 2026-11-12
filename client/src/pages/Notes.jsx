@@ -92,7 +92,7 @@ export default function Notes() {
         setNotes((prev) =>
           prev.map((n) =>
             n._id === selectedId
-              ? { ...n, title: draft.title.trim() || 'Untitled note', tags: parseTags(draft.tagsText), pinned: draft.pinned, archived: draft.archived }
+              ? { ...n, title: draft.title.trim() || 'Untitled note', tags: parseTags(draft.tagsText), pinned: draft.pinned, archived: draft.archived, courseId: draft.courseId || null }
               : n,
           ),
         );
