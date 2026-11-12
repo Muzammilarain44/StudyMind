@@ -61,3 +61,38 @@ export const tasksApi = {
 export const dashboardApi = {
   get: () => apiFetch('/dashboard'),
 };
+
+export const quizzesApi = {
+  list: (params) => apiFetch(`/quizzes${query(params)}`),
+  get: (id) => apiFetch(`/quizzes/${id}`),
+  create: (body) => apiFetch('/quizzes', { method: 'POST', body }),
+  update: (id, body) => apiFetch(`/quizzes/${id}`, { method: 'PUT', body }),
+  remove: (id) => apiFetch(`/quizzes/${id}`, { method: 'DELETE' }),
+  stats: (params) => apiFetch(`/quizzes/stats${query(params)}`),
+  submitAttempt: (id, body) => apiFetch(`/quizzes/${id}/attempts`, { method: 'POST', body }),
+  attempts: (id, params) => apiFetch(`/quizzes/${id}/attempts${query(params)}`),
+};
+
+export const flashcardDecksApi = {
+  list: (params) => apiFetch(`/flashcard-decks${query(params)}`),
+  get: (id) => apiFetch(`/flashcard-decks/${id}`),
+  create: (body) => apiFetch('/flashcard-decks', { method: 'POST', body }),
+  update: (id, body) => apiFetch(`/flashcard-decks/${id}`, { method: 'PUT', body }),
+  remove: (id) => apiFetch(`/flashcard-decks/${id}`, { method: 'DELETE' }),
+  cards: (id, params) => apiFetch(`/flashcard-decks/${id}/cards${query(params)}`),
+  addCard: (id, body) => apiFetch(`/flashcard-decks/${id}/cards`, { method: 'POST', body }),
+  updateCard: (id, cardId, body) =>
+    apiFetch(`/flashcard-decks/${id}/cards/${cardId}`, { method: 'PUT', body }),
+  removeCard: (id, cardId) => apiFetch(`/flashcard-decks/${id}/cards/${cardId}`, { method: 'DELETE' }),
+  due: (id, params) => apiFetch(`/flashcard-decks/${id}/due${query(params)}`),
+  review: (id, cardId, body) =>
+    apiFetch(`/flashcard-decks/${id}/cards/${cardId}/review`, { method: 'POST', body }),
+};
+
+export const studySessionsApi = {
+  list: (params) => apiFetch(`/study-sessions${query(params)}`),
+  start: (body) => apiFetch('/study-sessions', { method: 'POST', body }),
+  complete: (id, body) => apiFetch(`/study-sessions/${id}/complete`, { method: 'POST', body }),
+  abandon: (id) => apiFetch(`/study-sessions/${id}/abandon`, { method: 'POST', body: {} }),
+  summary: () => apiFetch('/study-sessions/summary'),
+};
