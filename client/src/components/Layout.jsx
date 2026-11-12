@@ -1,19 +1,46 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth.jsx';
+import { settingsApi } from '../lib/api.js';
+import { applyTheme, readStoredTheme } from '../lib/theme.js';
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(() => localStorage.getItem('studymind-theme') === 'dark');
+function ThemeToggle({ user }) {
+  const [dark, setDark] = useState(() => readStoredTheme() === 'dark');
+
+  // The server-side theme is the source of truth: when the logged-in user
+  // loads, adopt their saved theme (e.g. set on another device).
+  useEffect(() => {
+    if (user?.theme) {
+      const serverDark = user.theme === 'dark';
+      setDark((current) => {
+        if (current !== serverDark) applyTheme(user.theme);
+        return serverDark;
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('studymind-theme', dark ? 'dark' : 'light');
+    applyTheme(dark ? 'dark' : 'light');
   }, [dark]);
+
+  async function toggle() {
+    const next = !dark;
+    setDark(next);
+    // Persist the choice to the server too (best effort — the local
+    // toggle already applied, so a failed request is not an error here).
+    if (user) {
+      try {
+        await settingsApi.update({ theme: next ? 'dark' : 'light' });
+      } catch {
+        // Ignore: theme is already applied locally.
+      }
+    }
+  }
 
   return (
     <button
       type="button"
-      onClick={() => setDark((d) => !d)}
+      onClick={toggle}
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
       className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
     >
@@ -54,6 +81,10 @@ export default function Layout() {
         { to: '/quizzes', label: 'Quizzes' },
         { to: '/flashcards', label: 'Flashcards' },
         { to: '/pomodoro', label: 'Pomodoro' },
+        { to: '/gpa', label: 'GPA' },
+        { to: '/analytics', label: 'Analytics' },
+        { to: '/settings', label: 'Settings' },
+        ...(user.role === 'admin' ? [{ to: '/admin', label: 'Admin' }] : []),
         { to: '/profile', label: 'Profile' },
       ]
     : [
@@ -92,7 +123,7 @@ export default function Layout() {
               </button>
             )}
           </nav>
-          <ThemeToggle />
+          <ThemeToggle user={user} />
         </div>
       </header>
 
@@ -117,7 +148,7 @@ export default function Layout() {
                 </button>
               )}
               <p className="px-2 pt-4 text-xs leading-relaxed text-slate-400">
-                GPA and analytics arrive in Phase 5.
+                GPA, analytics, settings and admin arrived in Phase 5.
               </p>
             </nav>
           </aside>
