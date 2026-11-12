@@ -10,6 +10,9 @@ import coursesRouter from './routes/courses.js';
 import notesRouter from './routes/notes.js';
 import tasksRouter from './routes/tasks.js';
 import dashboardRouter from './routes/dashboard.js';
+import quizzesRouter from './routes/quizzes.js';
+import flashcardsRouter from './routes/flashcards.js';
+import studySessionsRouter from './routes/study-sessions.js';
 
 export function createApp() {
   const app = express();
@@ -76,6 +79,12 @@ export function createApp() {
   app.use('/api/v1/notes', notesRouter);
   app.use('/api/v1/tasks', tasksRouter);
   app.use('/api/v1/dashboard', dashboardRouter);
+
+  // Quizzes, flashcards, Pomodoro sessions — Phase 4. Same auth + ownership
+  // rules as Phase 3.
+  app.use('/api/v1/quizzes', quizzesRouter);
+  app.use('/api/v1/flashcard-decks', flashcardsRouter);
+  app.use('/api/v1/study-sessions', studySessionsRouter);
 
   // 404 for unknown API routes
   app.use('/api', (req, res) => {
