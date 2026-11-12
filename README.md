@@ -4,12 +4,14 @@ A student learning workspace for university and college students: course organis
 personal notes, study planning, MCQ quizzes, flashcards, Pomodoro sessions, GPA
 calculation and progress analytics.
 
-> **Honest status: Phase 2 — auth is live.** Register, login, logout, session restore
-> and password change work against a real MongoDB, with bcrypt-hashed passwords and
-> HttpOnly-cookie JWT sessions. Courses, notes, quizzes, flashcards, Pomodoro, GPA and
-> analytics are **not** built yet; they arrive in Phases 3–6. Nothing here is faked:
-> the dashboard shows only the real API health status plus an honest empty state —
-> no demo metrics, no fake charts.
+> **Honest status: Phase 3 — courses, notes, tasks and a real dashboard are live.**
+> Register, login, logout, session restore and password change work against a real
+> MongoDB, with bcrypt-hashed passwords and HttpOnly-cookie JWT sessions. Courses
+> (CRUD, semester, colour, archive), Markdown notes (autosave, search, tags, pin),
+> tasks (due dates, priorities, complete toggle, calendar view) and a dashboard
+> whose numbers are calculated from your own stored data all work. Quizzes,
+> flashcards, Pomodoro, GPA and analytics are **not** built yet; they arrive in
+> Phases 4–6. Nothing here is faked: no demo metrics, no fake charts.
 >
 > StudyMind is a portfolio project. It is **not** a generative-AI product: quiz
 > questions and flashcards are created by users/admins. There is no LLM and no
@@ -67,7 +69,7 @@ Build it: `npm run build`. Lint it: `npm run lint`.
 
 ```bash
 cd server
-npm test   # node:test — health endpoint (DB disconnected) + full auth flow against an in-memory MongoDB
+npm test   # node:test — health (DB disconnected) + auth flow + courses/notes/tasks/dashboard, all against an in-memory MongoDB
 ```
 
 ## Environment variables
@@ -102,8 +104,8 @@ locally, and re-check the vendors' free-tier limits at deploy time; they change.
 
 - **Phase 0:** Design & feasibility — done (`docs/phase-0-design-feasibility.md`).
 - **Phase 1:** Deployable skeleton — done.
-- **Phase 2:** Auth & ownership — this repo state.
-- **Phase 3:** Courses, notes & tasks.
+- **Phase 2:** Auth & ownership — done.
+- **Phase 3:** Courses, notes & tasks — this repo state.
 - **Phase 4:** Quiz, flashcards & Pomodoro.
 - **Phase 5:** GPA, analytics, settings & admin.
 - **Phase 6:** Polish & QA, end-to-end test on the deployed app.
