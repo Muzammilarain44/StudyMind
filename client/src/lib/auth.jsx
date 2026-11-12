@@ -1,7 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AuthContext } from './auth-context.js';
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-const AuthContext = createContext(null);
 
 async function authFetch(path, { method = 'GET', body } = {}) {
   const res = await fetch(`${API_BASE}/api/v1/auth${path}`, {
@@ -89,10 +89,4 @@ export function AuthProvider({ children }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider.');
-  return ctx;
 }
