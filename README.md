@@ -4,7 +4,7 @@ A student learning workspace for university and college students: course organis
 personal notes, study planning, MCQ quizzes, flashcards, Pomodoro sessions, GPA
 calculation and progress analytics.
 
-> **Honest status: Phase 4 — quizzes, flashcards and Pomodoro are live.**
+> **Honest status: Phase 5 — GPA, analytics, settings and admin are live.**
 > Register, login, logout, session restore and password change work against a real
 > MongoDB, with bcrypt-hashed passwords and HttpOnly-cookie JWT sessions. Courses
 > (CRUD, semester, colour, archive), Markdown notes (autosave, search, tags, pin),
@@ -14,9 +14,15 @@ calculation and progress analytics.
 > attempt history, per-course stats), flashcard decks with a flip animation and
 > spaced repetition (SM-2-lite, due queue synced with the DB), and Pomodoro focus
 > sessions (configurable durations, pause/resume, idempotent start so a tab refresh
-> never double-counts) — plus a real study streak on the dashboard. GPA and
-> analytics are **not** built yet; they arrive in Phases 5–6. Nothing here is
-> faked: no demo metrics, no fake charts.
+> never double-counts) — plus a real study streak on the dashboard. Phase 5 adds
+> a credit-weighted GPA calculator with a configurable grading scale (every result
+> labelled an estimate), real analytics charts from stored data (focus minutes,
+> tasks, quiz scores, per-course breakdown, date filters), settings (theme and
+> timezone saved on the account, JSON/CSV export of your own data, password-
+> confirmed account deletion) and an admin panel (server-verified role, curated
+> subjects, sample quiz banks students can copy, aggregate usage counts only —
+> no open admin self-registration). Only Phase 6 (polish & QA) remains.
+> Nothing here is faked: no demo metrics, no fake charts.
 >
 > StudyMind is a portfolio project. It is **not** a generative-AI product: quiz
 > questions and flashcards are created by users/admins. There is no LLM and no
@@ -24,7 +30,7 @@ calculation and progress analytics.
 
 ## Stack
 
-- Frontend: React 18 + Vite 5, React Router, Tailwind CSS 3, JavaScript
+- Frontend: React 18 + Vite 5, React Router, Tailwind CSS 3, Recharts (analytics charts, code-split), JavaScript
 - Backend: Node.js + Express 4, Mongoose, JavaScript
 - Database: MongoDB (MongoDB Atlas Free cluster for deployment)
 - CI: GitHub Actions (Node 20)
@@ -111,8 +117,8 @@ locally, and re-check the vendors' free-tier limits at deploy time; they change.
 - **Phase 1:** Deployable skeleton — done.
 - **Phase 2:** Auth & ownership — done.
 - **Phase 3:** Courses, notes & tasks — done.
-- **Phase 4:** Quiz, flashcards & Pomodoro — this repo state.
-- **Phase 5:** GPA, analytics, settings & admin.
+- **Phase 4:** Quiz, flashcards & Pomodoro — done.
+- **Phase 5:** GPA, analytics, settings & admin — this repo state.
 - **Phase 6:** Polish & QA, end-to-end test on the deployed app.
 
 Each phase ends with a report (files changed, commands + output, tests pass/fail with
