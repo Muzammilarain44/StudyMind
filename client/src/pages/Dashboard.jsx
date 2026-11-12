@@ -71,14 +71,15 @@ export default function Dashboard() {
     );
   }
 
-  const hasAnything = data.totalCourses > 0 || data.totalTasks > 0;
+  const hasAnything = data.totalCourses > 0 || data.totalTasks > 0 || (data.quizzesTaken ?? 0) > 0;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Welcome back{user ? `, ${user.name}` : ''}</h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          Every number below is calculated from your own courses, notes and tasks — nothing is invented.
+          Every number below is calculated from your own courses, notes, tasks, quizzes and
+          focus sessions — nothing is invented.
         </p>
       </div>
 
@@ -87,6 +88,17 @@ export default function Dashboard() {
         <Stat label="Tasks done" value={`${data.completedTasks} / ${data.totalTasks}`} to="/planner" />
         <Stat label="Overdue tasks" value={data.overdueTasks} to="/planner" />
         <Stat label="Due today" value={data.dueTodayTasks} to="/planner" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label="Study streak" value={`${data.studyStreakDays ?? 0} day${(data.studyStreakDays ?? 0) === 1 ? '' : 's'}`} to="/pomodoro" />
+        <Stat label="Focus today" value={`${data.focusMinutesToday ?? 0} min`} to="/pomodoro" />
+        <Stat label="Quizzes taken" value={data.quizzesTaken ?? 0} to="/quizzes" />
+        <Stat
+          label="Average quiz score"
+          value={data.averageQuizPercentage === null || data.averageQuizPercentage === undefined ? '—' : `${data.averageQuizPercentage}%`}
+          to="/quizzes"
+        />
       </div>
 
       {!hasAnything && (
