@@ -4,8 +4,8 @@ A student learning workspace for university and college students: course organis
 personal notes, study planning, MCQ quizzes, flashcards, Pomodoro sessions, GPA
 calculation and progress analytics.
 
-> **Honest status: Phase 5 — GPA, analytics, settings and admin are live.**
-> Register, login, logout, session restore and password change work against a real
+> **Honest status: Phase 6 (final) — polish & QA is done. All six phases are
+> built.** Register, login, logout, session restore and password change work against a real
 > MongoDB, with bcrypt-hashed passwords and HttpOnly-cookie JWT sessions. Courses
 > (CRUD, semester, colour, archive), Markdown notes (autosave, search, tags, pin),
 > tasks (due dates, priorities, complete toggle, calendar view) and a dashboard
@@ -21,7 +21,13 @@ calculation and progress analytics.
 > timezone saved on the account, JSON/CSV export of your own data, password-
 > confirmed account deletion) and an admin panel (server-verified role, curated
 > subjects, sample quiz banks students can copy, aggregate usage counts only —
-> no open admin self-registration). Only Phase 6 (polish & QA) remains.
+> no open admin self-registration). Phase 6 (final) polished it: responsive
+> layouts checked at 1280px and 390px in a real browser, dark mode with no
+> white flash, keyboard focus styles, a security audit, two small behaviour
+> fixes (course-delete link cleanup, invalid task date filters → 400), a
+> click-by-click demo script and real screenshots. The full local end-to-end
+> journey passes 45/45 browser checks. The deployed end-to-end test is still
+> blocked on deployment — no live URLs exist yet.
 > Nothing here is faked: no demo metrics, no fake charts.
 >
 > StudyMind is a portfolio project. It is **not** a generative-AI product: quiz
@@ -80,8 +86,23 @@ Build it: `npm run build`. Lint it: `npm run lint`.
 
 ```bash
 cd server
-npm test   # node:test — health (DB disconnected) + auth flow + courses/notes/tasks/dashboard, all against an in-memory MongoDB
+npm test   # node:test — 59 tests: health + auth + Phase 3/4/5/6, all against an in-memory MongoDB
 ```
+
+## Demo & screenshots
+
+Walk the finished app click-by-click with [`docs/demo-script.md`](docs/demo-script.md).
+Real screenshots from the Phase 6 browser run (demo account, real data):
+
+| Screenshot | Shows |
+|---|---|
+| [`docs/screenshots/desktop-dashboard.png`](docs/screenshots/desktop-dashboard.png) | Dashboard, desktop, light mode |
+| [`docs/screenshots/desktop-dashboard-dark.png`](docs/screenshots/desktop-dashboard-dark.png) | Dashboard, desktop, dark mode |
+| [`docs/screenshots/desktop-courses.png`](docs/screenshots/desktop-courses.png) | Courses, desktop |
+| [`docs/screenshots/desktop-quiz.png`](docs/screenshots/desktop-quiz.png) | Quiz result (1/1, 100%), desktop |
+| [`docs/screenshots/desktop-pomodoro.png`](docs/screenshots/desktop-pomodoro.png) | Pomodoro timer running, desktop |
+| [`docs/screenshots/mobile-dashboard.png`](docs/screenshots/mobile-dashboard.png) | Dashboard, phone (390px) |
+| [`docs/screenshots/mobile-courses.png`](docs/screenshots/mobile-courses.png) | Courses, phone (390px) |
 
 ## Environment variables
 
@@ -118,8 +139,11 @@ locally, and re-check the vendors' free-tier limits at deploy time; they change.
 - **Phase 2:** Auth & ownership — done.
 - **Phase 3:** Courses, notes & tasks — done.
 - **Phase 4:** Quiz, flashcards & Pomodoro — done.
-- **Phase 5:** GPA, analytics, settings & admin — this repo state.
-- **Phase 6:** Polish & QA, end-to-end test on the deployed app.
+- **Phase 5:** GPA, analytics, settings & admin — done.
+- **Phase 6:** Polish & QA, end-to-end test on the deployed app — done locally
+  (59 server tests, 45/45 browser checks). The deployed end-to-end test is
+  blocked on deployment — see `docs/setup.md` for the manual Atlas/Render/
+  Vercel steps; no live URLs exist yet.
 
 Each phase ends with a report (files changed, commands + output, tests pass/fail with
 evidence, live URLs only if actually deployed, known issues) and the question
