@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "dompurify": "^3.4.17",
+    "marked": "^18.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"
   },
-  "description": "StudyMind frontend \u2014 Vite + React (Phase 2: auth)",
+  "description": "StudyMind frontend \u2014 Vite + React (Phase 3: courses, notes, tasks)",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -27,5 +29,5 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "0.2.0"
+  "version": "0.3.0"
 }
