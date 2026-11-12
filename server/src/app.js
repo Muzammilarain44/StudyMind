@@ -13,6 +13,10 @@ import dashboardRouter from './routes/dashboard.js';
 import quizzesRouter from './routes/quizzes.js';
 import flashcardsRouter from './routes/flashcards.js';
 import studySessionsRouter from './routes/study-sessions.js';
+import gpaRouter from './routes/gpa.js';
+import analyticsRouter from './routes/analytics.js';
+import settingsRouter from './routes/settings.js';
+import adminRouter from './routes/admin.js';
 
 export function createApp() {
   const app = express();
@@ -85,6 +89,13 @@ export function createApp() {
   app.use('/api/v1/quizzes', quizzesRouter);
   app.use('/api/v1/flashcard-decks', flashcardsRouter);
   app.use('/api/v1/study-sessions', studySessionsRouter);
+
+  // GPA, analytics, settings, admin — Phase 5. Same auth + ownership rules;
+  // admin routes additionally enforce the server-side admin role.
+  app.use('/api/v1/gpa-records', gpaRouter);
+  app.use('/api/v1/analytics', analyticsRouter);
+  app.use('/api/v1/settings', settingsRouter);
+  app.use('/api/v1/admin', adminRouter);
 
   // 404 for unknown API routes
   app.use('/api', (req, res) => {
