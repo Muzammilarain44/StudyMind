@@ -38,20 +38,26 @@ export function verifyToken(token) {
 }
 
 export function setAuthCookie(res, token) {
+  // Production is cross-site (Vercel frontend -> Render backend), so the
+  // cookie must be SameSite=None (with Secure) or the browser will not send
+  // it back on API calls and every logged-in request is 401. In dev the
+  // frontend and backend are same-site, so Lax is fine there.
+  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
     path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 }
 
 export function clearAuthCookie(res) {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction,
     path: '/',
   });
 }
