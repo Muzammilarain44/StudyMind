@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth.jsx';
 
 export default function Profile() {
@@ -131,6 +131,13 @@ export default function Profile() {
       >
         Log out
       </button>
+      <p className="text-sm text-slate-600 dark:text-slate-400">
+        Theme, timezone, data export and account deletion live in{' '}
+        <Link to="/settings" className="font-medium text-brand-600 hover:underline dark:text-brand-100">
+          Settings
+        </Link>
+        .
+      </p>
     </div>
   );
 }
