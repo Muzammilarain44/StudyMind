@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/use-auth.js';
 import { settingsApi } from '../lib/api.js';
 import { applyTheme, readStoredTheme } from '../lib/theme.js';
 
