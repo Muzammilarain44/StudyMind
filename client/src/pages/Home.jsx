@@ -25,7 +25,7 @@ export default function Home() {
           </Link>
         </div>
         <p className="mt-4 text-xs text-indigo-200">
-          Phase 1 skeleton: auth, courses, notes and the rest arrive in later phases.
+          Phase 2: auth is live. Courses, notes and the rest arrive in later phases.
         </p>
       </section>
 

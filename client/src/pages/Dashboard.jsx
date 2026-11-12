@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { fetchHealth } from '../lib/api.js';
+import { useAuth } from '../lib/auth.jsx';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [health, setHealth] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -26,9 +28,9 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">Welcome back{user ? `, ${user.name}` : ''}</h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          Phase 1 skeleton — real metrics arrive once you have courses, tasks and sessions (Phases 3–5).
+          Phase 2 — auth is live. Real metrics arrive once you have courses, tasks and sessions (Phases 3–5).
         </p>
       </div>
 
