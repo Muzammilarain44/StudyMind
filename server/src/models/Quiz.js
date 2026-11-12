@@ -28,6 +28,10 @@ const quizSchema = new mongoose.Schema(
     courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', default: null },
     // Optional attempt timer in seconds; null means no timer.
     timeLimitSeconds: { type: Number, min: 10, max: 14400, default: null },
+    // True for platform sample quizzes created by an admin. Samples are
+    // platform content: students browse and copy them, and they survive an
+    // admin deleting their own account.
+    isSample: { type: Boolean, default: false },
     questions: {
       type: [questionSchema],
       required: true,
