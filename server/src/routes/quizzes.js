@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.use(requireAuth, requireDb);
 
-const questionSchema = z
+export const questionSchema = z
   .object({
     question: z.string().trim().min(1, 'Question text is required.').max(500),
     options: z
@@ -32,7 +32,7 @@ const questionSchema = z
     message: 'correctIndex must point at one of the options.',
   });
 
-const quizSchema = z.object({
+export const quizSchema = z.object({
   title: z.string().trim().min(1, 'Title is required.').max(120),
   description: z.string().trim().max(500).optional(),
   courseId: z.string().optional().nullable(),
