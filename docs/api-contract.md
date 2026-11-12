@@ -1,4 +1,4 @@
-# StudyMind — API Contract (Phase 2)
+# StudyMind — API Contract (Phase 3)
 
 Base prefix for versioned endpoints: `/api/v1`. The health endpoint is also
 available unversioned at `/api/health` for deployment checks.
@@ -79,12 +79,81 @@ Requires the auth cookie. Body: `{ "currentPassword", "newPassword" }`
 - **200** — `{ "ok": true }` (old password stops working immediately).
 - **401** — current password wrong, or no valid session.
 
+## Courses, notes, tasks, dashboard — `/api/v1/*` (Phase 3, real)
+
+All of these require the auth cookie (401 without a valid session). Every
+read/write enforces ownership server-side: a document belonging to another
+user behaves as if it does not exist (**404**, never 403 — no existence leak).
+Supplying another user's `courseId` on a note/task is **400**. All routes
+return **503** `{ "error": "Database unavailable. Please try again later." }`
+when MongoDB is down. List endpoints are paginated: `?page` (default 1) and
+`?limit` (default 20, max 100), returning `{ <items>, total, page, limit,
+totalPages }`. Invalid input is **400** (Zod message); a malformed id in the
+URL is **404**.
+
+### Courses — `/api/v1/courses`
+
+Course: `{ "_id", "userId", "title" (≤120), "code" (≤20, optional),
+"semester", "colour" (hex, default "#4F46E5"), "creditHours" (0–12, optional),
+"archived" (default false), "createdAt", "updatedAt" }`.
+
+- `GET /api/v1/courses` — `?archived`, `?semester`, `?search` (title substring).
+- `POST /api/v1/courses` — **201** `{ "course" }`. Title and semester required.
+- `GET /api/v1/courses/:id` — **200** `{ "course" }`, else 404.
+- `PUT /api/v1/courses/:id` — partial update (archive/unarchive via `{ "archived": true/false }`). **200** `{ "course" }`.
+- `DELETE /api/v1/courses/:id` — **200** `{ "ok": true }`. Does not delete notes/tasks.
+
+### Notes — `/api/v1/notes`
+
+Note: `{ "_id", "userId", "courseId" (nullable), "title" (≤200),
+"contentMarkdown", "tags" (≤10, each ≤30), "pinned", "archived",
+"createdAt", "updatedAt" }`.
+
+- `GET /api/v1/notes` — `?search` (title/content substring), `?courseId`, `?tag`, `?pinned`, `?archived`. Pinned notes sort first, then most recently updated.
+- `POST /api/v1/notes` — **201** `{ "note" }`.
+- `GET /api/v1/notes/:id` — **200** `{ "note" }`, else 404.
+- `PUT /api/v1/notes/:id` — also the autosave endpoint; partial update, returns the updated note with a new `updatedAt`. **200** `{ "note" }`.
+- `DELETE /api/v1/notes/:id` — **200** `{ "ok": true }`.
+
+### Tasks — `/api/v1/tasks`
+
+Task: `{ "_id", "userId", "courseId" (nullable), "title" (≤200),
+"description" (≤2000), "dueDate" (ISO date, nullable), "priority"
+("low" | "medium" | "high", default "medium"), "completed",
+"completedAt" (nullable), "createdAt", "updatedAt" }`.
+
+- `GET /api/v1/tasks` — `?completed`, `?courseId`, `?priority`, `?dueBefore`, `?dueAfter` (ISO dates).
+- `POST /api/v1/tasks` — **201** `{ "task" }`. Creating with `completed: true` stamps `completedAt`.
+- `GET /api/v1/tasks/:id` — **200** `{ "task" }`, else 404.
+- `PUT /api/v1/tasks/:id` — partial update. `completed: true` stamps `completedAt`; `completed: false` clears it. **200** `{ "task" }`.
+- `DELETE /api/v1/tasks/:id` — **200** `{ "ok": true }`.
+
+### Dashboard — `/api/v1/dashboard`
+
+`GET /api/v1/dashboard` — **200**, all numbers calculated from the logged-in
+user's own stored data only:
+
+```json
+{
+  "totalCourses": 1, "activeCourses": 1,
+  "totalTasks": 1, "completedTasks": 1,
+  "overdueTasks": 0, "dueTodayTasks": 0, "dueNext7Days": 0,
+  "recentNotes": [{ "_id", "title", "courseId", "courseTitle", "updatedAt", "pinned" }],
+  "nextTasks": [{ "_id", "title", "courseId", "dueDate", "priority" }],
+  "tasksByCourse": [{ "courseId", "title", "colour", "total", "completed" }]
+}
+```
+
+Overdue = incomplete with `dueDate` before now. "Due today / next 7 days" count
+incomplete tasks only. No study-time or quiz fields exist yet — they are not
+invented; they arrive in Phases 4–5.
+
 ## Unknown routes
 
 `GET /api/<anything-else>` → HTTP 404, `{ "error": "Not found" }`.
 
-## Future endpoints (Phases 3–6, not implemented)
+## Future endpoints (Phases 4–6, not implemented)
 
-See `docs/phase-0-design-feasibility.md` §7 for the full endpoint plan
-(`/courses`, `/notes`, `/tasks`, `/quizzes`, `/flashcard-decks`,
-`/study-sessions`, `/gpa-records`, `/analytics/overview`, `/admin/subjects`).
+See `docs/phase-0-design-feasibility.md` §7 for the remaining endpoint plan
+(`/quizzes`, `/flashcard-decks`, `/study-sessions`, `/gpa-records`,
+`/analytics/overview`, `/admin/subjects`).

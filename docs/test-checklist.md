@@ -1,9 +1,9 @@
-# StudyMind — Test Checklist (Phase 1)
+# StudyMind — Test Checklist (Phase 3)
 
 ## Automated (run before every commit)
 
-- [ ] `cd server && npm test` — all tests pass (health 503-shape with DB down,
-      `/api/v1/health` mirrors it, `/` text, auth placeholder 501).
+- [ ] `cd server && npm test` — all tests pass (4 health + 9 auth + 14 Phase 3:
+      courses/notes/tasks CRUD, ownership 404s, validation 400s, dashboard math).
 - [ ] `cd server && npm run lint` — no syntax errors (`node --check`).
 - [ ] `cd client && npm run lint` — ESLint passes.
 - [ ] `cd client && npm run build` — Vite build passes, `dist/` is produced.
@@ -16,16 +16,21 @@
 - [ ] `curl http://localhost:5000/` returns `StudyMind API running`.
 - [ ] `curl http://localhost:5000/api/health` returns 503 + `db: "disconnected"` (no DB).
 - [ ] With a real `MONGODB_URI`: health returns 200 + `db: "connected"`.
-- [ ] `curl -X POST http://localhost:5000/api/v1/auth/login` returns 501.
+- [ ] `curl -X POST http://localhost:5000/api/v1/auth/login` with no DB returns 503.
 - [ ] `curl http://localhost:5000/api/unknown` returns 404 JSON.
+- [ ] With a DB: register → create course → create note → create task → complete task → `GET /api/v1/dashboard` numbers match the data created.
+- [ ] A second user's cookie on the first user's course/note/task returns 404.
+- [ ] `GET /api/v1/courses` without a cookie returns 401.
 
 ### Frontend — desktop (Chrome, width ≥ 1024px)
 - [ ] Home loads: hero, 4 feature cards, no console errors.
 - [ ] Sidebar + topbar visible on Dashboard / Login / Register.
-- [ ] Login page: form renders, submit button is disabled and says "coming in Phase 2".
-- [ ] Register page: same — disabled button, no fake account creation.
-- [ ] Dashboard with backend running: shows HTTP status, API status, DB status, timestamp.
-- [ ] Dashboard with backend stopped: shows a clear "Could not reach the API" error, not a blank page.
+- [ ] Login page: real login works and redirects to the Dashboard.
+- [ ] Courses: create/edit/archive/delete work; search and semester filter work; empty state shows when there are no courses.
+- [ ] Notes: create, edit with autosave ("Saving… / ✓ Saved"), Markdown preview renders headings/lists, search/tag/pin filters work.
+- [ ] Planner: create/edit/complete/delete tasks; overdue tasks highlighted; month calendar shows task counts and day-click filters the list.
+- [ ] Dashboard with data: stat cards, next tasks, recent notes and per-course progress bars match the stored data; empty states are honest when there is no data.
+- [ ] Dashboard with backend stopped: shows a clear "Could not load the dashboard" error, not a blank page.
 - [ ] Dark mode toggle works and survives a page reload (localStorage).
 - [ ] Unknown route (e.g. `/nope`) shows the "Page not found" page.
 - [ ] Keyboard: Tab reaches all links, buttons and inputs in a sensible order.

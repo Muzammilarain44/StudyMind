@@ -1,4 +1,4 @@
-# StudyMind — Setup (Phase 2)
+# StudyMind — Setup (Phase 3)
 
 ## Prerequisites
 
@@ -26,7 +26,8 @@ npm run dev                 # http://localhost:5173
 ```
 
 Open http://localhost:5173 — Home, Login, Register and Dashboard should all load.
-The Dashboard fetches the live health status from the backend.
+After logging in, Courses, Notes and Planner are available; the Dashboard shows
+real metrics calculated from your own data.
 
 ## Environment variables
 
@@ -40,11 +41,12 @@ Copy the `.env.example` files and fill in your own values. Never commit a real `
 | `server/.env` | `JWT_SECRET` | Long random secret for auth cookies (≥ 32 chars). Generate one: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Production refuses to start without it; dev uses a warned dev-only default. Never commit a real value. |
 | `client/.env` | `VITE_API_URL` | Backend URL in production; leave unset in dev (Vite proxy) |
 
-Auth needs a database: register/login return 503 while MongoDB is down.
-For local testing without Atlas, the server test suite uses an in-memory
-MongoDB (`mongodb-memory-server`, dev-only) — see `server/test/auth.test.js`.
+Auth, courses, notes and tasks all need a database: they return 503 while
+MongoDB is down. For local testing without Atlas, the server test suite uses
+an in-memory MongoDB (`mongodb-memory-server`, dev-only) — see
+`server/test/phase3.test.js`. Phase 3 adds no new environment variables.
 
-## Deployment (manual steps — do not deploy until Phase 1 is verified)
+## Deployment (manual steps — no live deployment exists yet)
 
 ### 1. MongoDB Atlas (Free cluster)
 
