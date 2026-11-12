@@ -9,6 +9,9 @@ import Profile from './pages/Profile.jsx';
 import Courses from './pages/Courses.jsx';
 import Notes from './pages/Notes.jsx';
 import Planner from './pages/Planner.jsx';
+import Quizzes from './pages/Quizzes.jsx';
+import Flashcards from './pages/Flashcards.jsx';
+import Pomodoro from './pages/Pomodoro.jsx';
 
 function NotFound() {
   return (
@@ -33,6 +36,9 @@ export default function App() {
           <Route path="/courses" element={<Courses />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/planner" element={<Planner />} />
+          <Route path="/quizzes" element={<Quizzes />} />
+          <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/pomodoro" element={<Pomodoro />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
