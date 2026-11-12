@@ -4,14 +4,19 @@ A student learning workspace for university and college students: course organis
 personal notes, study planning, MCQ quizzes, flashcards, Pomodoro sessions, GPA
 calculation and progress analytics.
 
-> **Honest status: Phase 3 — courses, notes, tasks and a real dashboard are live.**
+> **Honest status: Phase 4 — quizzes, flashcards and Pomodoro are live.**
 > Register, login, logout, session restore and password change work against a real
 > MongoDB, with bcrypt-hashed passwords and HttpOnly-cookie JWT sessions. Courses
 > (CRUD, semester, colour, archive), Markdown notes (autosave, search, tags, pin),
 > tasks (due dates, priorities, complete toggle, calendar view) and a dashboard
-> whose numbers are calculated from your own stored data all work. Quizzes,
-> flashcards, Pomodoro, GPA and analytics are **not** built yet; they arrive in
-> Phases 4–6. Nothing here is faked: no demo metrics, no fake charts.
+> whose numbers are calculated from your own stored data all work. Phase 4 adds
+> user-created MCQ quizzes (optional timer, server-side auto-grading, explanations,
+> attempt history, per-course stats), flashcard decks with a flip animation and
+> spaced repetition (SM-2-lite, due queue synced with the DB), and Pomodoro focus
+> sessions (configurable durations, pause/resume, idempotent start so a tab refresh
+> never double-counts) — plus a real study streak on the dashboard. GPA and
+> analytics are **not** built yet; they arrive in Phases 5–6. Nothing here is
+> faked: no demo metrics, no fake charts.
 >
 > StudyMind is a portfolio project. It is **not** a generative-AI product: quiz
 > questions and flashcards are created by users/admins. There is no LLM and no
@@ -105,8 +110,8 @@ locally, and re-check the vendors' free-tier limits at deploy time; they change.
 - **Phase 0:** Design & feasibility — done (`docs/phase-0-design-feasibility.md`).
 - **Phase 1:** Deployable skeleton — done.
 - **Phase 2:** Auth & ownership — done.
-- **Phase 3:** Courses, notes & tasks — this repo state.
-- **Phase 4:** Quiz, flashcards & Pomodoro.
+- **Phase 3:** Courses, notes & tasks — done.
+- **Phase 4:** Quiz, flashcards & Pomodoro — this repo state.
 - **Phase 5:** GPA, analytics, settings & admin.
 - **Phase 6:** Polish & QA, end-to-end test on the deployed app.
 
