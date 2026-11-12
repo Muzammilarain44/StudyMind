@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-
-const NAV = [
-  { to: '/', label: 'Home' },
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/login', label: 'Login' },
-  { to: '/register', label: 'Register' },
-];
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/auth.jsx';
 
 function ThemeToggle() {
   const [dark, setDark] = useState(() => localStorage.getItem('studymind-theme') === 'dark');
@@ -28,9 +22,45 @@ function ThemeToggle() {
   );
 }
 
+function navClass({ isActive }) {
+  return `rounded-lg px-3 py-1.5 text-sm font-medium ${
+    isActive
+      ? 'bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-white'
+      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+  }`;
+}
+
+function sidebarClass({ isActive }) {
+  return `block rounded-lg px-3 py-2 text-sm font-medium ${
+    isActive
+      ? 'bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-white'
+      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+  }`;
+}
+
 export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const isLanding = location.pathname === '/';
+
+  const NAV = user
+    ? [
+        { to: '/', label: 'Home' },
+        { to: '/dashboard', label: 'Dashboard' },
+        { to: '/profile', label: 'Profile' },
+      ]
+    : [
+        { to: '/', label: 'Home' },
+        { to: '/dashboard', label: 'Dashboard' },
+        { to: '/login', label: 'Login' },
+        { to: '/register', label: 'Register' },
+      ];
+
+  async function handleLogout() {
+    await logout();
+    navigate('/login', { replace: true });
+  }
 
   return (
     <div className="min-h-screen">
@@ -42,20 +72,19 @@ export default function Layout() {
           </Link>
           <nav aria-label="Main navigation" className="hidden items-center gap-1 sm:flex">
             {NAV.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-1.5 text-sm font-medium ${
-                    isActive
-                      ? 'bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-white'
-                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                  }`
-                }
-              >
+              <NavLink key={item.to} to={item.to} className={navClass}>
                 {item.label}
               </NavLink>
             ))}
+            {user && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                Log out
+              </button>
+            )}
           </nav>
           <ThemeToggle />
         </div>
@@ -68,20 +97,19 @@ export default function Layout() {
             <nav className="sticky top-20 space-y-1 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
               <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Workspace</p>
               {NAV.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `block rounded-lg px-3 py-2 text-sm font-medium ${
-                      isActive
-                        ? 'bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                    }`
-                  }
-                >
+                <NavLink key={item.to} to={item.to} className={sidebarClass}>
                   {item.label}
                 </NavLink>
               ))}
+              {user && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  Log out
+                </button>
+              )}
               <p className="px-2 pt-4 text-xs leading-relaxed text-slate-400">
                 Courses, notes, quizzes and more arrive in Phases 3–5.
               </p>
