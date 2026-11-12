@@ -26,7 +26,7 @@ function NotFound() {
     <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
       <h1 className="text-xl font-bold">Page not found</h1>
       <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-        This page does not exist yet. Use the navigation above to go somewhere real.
+        This page does not exist. Use the navigation above to go somewhere real.
       </p>
     </div>
   );
