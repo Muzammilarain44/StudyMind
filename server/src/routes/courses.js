@@ -1,6 +1,11 @@
 import express from 'express';
 import { z } from 'zod';
 import { Course } from '../models/Course.js';
+import { Note } from '../models/Note.js';
+import { Task } from '../models/Task.js';
+import { Quiz } from '../models/Quiz.js';
+import { FlashcardDeck } from '../models/FlashcardDeck.js';
+import { GpaRecord } from '../models/GpaRecord.js';
 import { requireAuth } from '../middleware/auth.js';
 import {
   escapeRegExp,
@@ -91,10 +96,21 @@ router.put('/:id', async (req, res, next) => {
 });
 
 // DELETE /api/v1/courses/:id
+// The course's notes, tasks, quizzes, decks and GPA records are kept —
+// only their link to this course is cleared, so nothing the user wrote
+// is lost when a course is removed (Phase 6 data-integrity fix).
 router.delete('/:id', async (req, res, next) => {
   try {
     const course = await Course.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
     if (!course) return res.status(404).json({ error: 'Course not found.' });
+    const unlink = { userId: req.user._id, courseId: course._id };
+    await Promise.all([
+      Note.updateMany(unlink, { $set: { courseId: null } }),
+      Task.updateMany(unlink, { $set: { courseId: null } }),
+      Quiz.updateMany(unlink, { $set: { courseId: null } }),
+      FlashcardDeck.updateMany(unlink, { $set: { courseId: null } }),
+      GpaRecord.updateMany(unlink, { $set: { courseId: null } }),
+    ]);
     return res.json({ ok: true });
   } catch (err) {
     return next(err);

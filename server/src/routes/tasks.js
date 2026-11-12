@@ -48,9 +48,27 @@ router.get('/', async (req, res, next) => {
     }
     if (req.query.priority) filter.priority = String(req.query.priority);
     if (req.query.dueBefore || req.query.dueAfter) {
+      // Invalid dates are a 400, not a silent non-match (Phase 6): an
+      // Invalid Date used to fall through to a Mongoose CastError → 404.
+      const parseDate = (value, name) => {
+        const d = new Date(String(value));
+        if (Number.isNaN(d.getTime())) {
+          res.status(400).json({ error: `${name} is not a valid date.` });
+          return undefined;
+        }
+        return d;
+      };
       filter.dueDate = {};
-      if (req.query.dueBefore) filter.dueDate.$lt = new Date(String(req.query.dueBefore));
-      if (req.query.dueAfter) filter.dueDate.$gte = new Date(String(req.query.dueAfter));
+      if (req.query.dueBefore) {
+        const d = parseDate(req.query.dueBefore, 'dueBefore');
+        if (d === undefined) return;
+        filter.dueDate.$lt = d;
+      }
+      if (req.query.dueAfter) {
+        const d = parseDate(req.query.dueAfter, 'dueAfter');
+        if (d === undefined) return;
+        filter.dueDate.$gte = d;
+      }
     }
     const [tasks, total] = await Promise.all([
       Task.find(filter).sort({ dueDate: 1, createdAt: -1 }).skip(skip).limit(limit),
