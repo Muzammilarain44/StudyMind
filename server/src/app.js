@@ -1,9 +1,11 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { dbStatus } from './db.js';
+import authRouter from './routes/auth.js';
 
 export function createApp() {
   const app = express();
@@ -11,8 +13,10 @@ export function createApp() {
   app.use(helmet());
   app.use(morgan('dev'));
   app.use(express.json({ limit: '100kb' }));
+  app.use(cookieParser());
 
-  // CORS allowlist from env (comma-separated). Default: Vite dev server only.
+  // CORS allowlist from env (comma-separated). Credentials enabled so the
+  // browser sends the HttpOnly auth cookie cross-origin (Vercel -> Render).
   const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
     .split(',')
     .map((o) => o.trim())
@@ -25,8 +29,19 @@ export function createApp() {
         if (allowedOrigins.includes(origin)) return callback(null, true);
         return callback(new Error(`Origin not allowed by CORS: ${origin}`));
       },
+      credentials: true,
     }),
   );
+
+  // General API rate limit (auth has its own tighter limiter below).
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 300,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' },
+  });
+  app.use('/api', apiLimiter);
 
   const healthPayload = () => ({
     status: dbStatus() === 'connected' ? 'ok' : 'degraded',
@@ -47,18 +62,9 @@ export function createApp() {
     res.type('text').send('StudyMind API running');
   });
 
-  // Auth placeholder — Phase 2. Rate-limited, and explicitly NOT faked.
-  const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 20,
-    standardHeaders: 'draft-7',
-    legacyHeaders: false,
-    message: { error: 'Too many auth requests, please try again later.' },
-  });
-  app.use('/api/v1/auth', authLimiter);
-  app.all('/api/v1/auth/*', (req, res) => {
-    res.status(501).json({ error: 'Auth is coming in Phase 2 — not implemented yet.' });
-  });
+  // Auth — Phase 2. The tight register/login limiter lives in routes/auth.js
+  // (10 per 15 min / IP); /me, /logout and /change-password are session-gated.
+  app.use('/api/v1/auth', authRouter);
 
   // 404 for unknown API routes
   app.use('/api', (req, res) => {
