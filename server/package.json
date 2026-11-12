@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0"
+  },
+  "description": "StudyMind backend \u2014 Express API (Phase 1 skeleton)",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "src/index.js",
+  "name": "studymind-server",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "lint": "node --check src/index.js && node --check src/app.js && node --check src/db.js",
+    "start": "node src/index.js",
+    "test": "node --test test/health.test.js"
+  },
+  "type": "module",
+  "version": "0.1.0"
+}
