@@ -4,12 +4,12 @@ A student learning workspace for university and college students: course organis
 personal notes, study planning, MCQ quizzes, flashcards, Pomodoro sessions, GPA
 calculation and progress analytics.
 
-> **Honest status: Phase 1 skeleton only.** This repo currently contains a deployable
-> skeleton — a Vite React frontend, an Express API with a health endpoint, and CI.
-> Auth, courses, notes, quizzes, flashcards, Pomodoro, GPA and analytics are **not**
-> built yet; they arrive in Phases 2–6. Nothing here is faked: the login/register forms
-> say plainly that auth comes in Phase 2, and the dashboard shows only the real API
-> health status plus an honest empty state — no demo metrics, no fake charts.
+> **Honest status: Phase 2 — auth is live.** Register, login, logout, session restore
+> and password change work against a real MongoDB, with bcrypt-hashed passwords and
+> HttpOnly-cookie JWT sessions. Courses, notes, quizzes, flashcards, Pomodoro, GPA and
+> analytics are **not** built yet; they arrive in Phases 3–6. Nothing here is faked:
+> the dashboard shows only the real API health status plus an honest empty state —
+> no demo metrics, no fake charts.
 >
 > StudyMind is a portfolio project. It is **not** a generative-AI product: quiz
 > questions and flashcards are created by users/admins. There is no LLM and no
@@ -67,7 +67,7 @@ Build it: `npm run build`. Lint it: `npm run lint`.
 
 ```bash
 cd server
-npm test   # node:test — health endpoint with DB disconnected, auth placeholder 501
+npm test   # node:test — health endpoint (DB disconnected) + full auth flow against an in-memory MongoDB
 ```
 
 ## Environment variables
@@ -77,6 +77,7 @@ npm test   # node:test — health endpoint with DB disconnected, auth placeholde
 | `PORT` | server | `5000` |
 | `MONGODB_URI` | server | `mongodb+srv://<user>:<password>@<cluster>/<db>?retryWrites=true&w=majority` |
 | `CORS_ORIGIN` | server | `http://localhost:5173` (comma-separated allowlist in production) |
+| `JWT_SECRET` | server | Long random secret (≥ 32 chars). Generate: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Production refuses to start without it. |
 | `VITE_API_URL` | client | `http://localhost:5000` (leave unset in dev to use the Vite proxy) |
 
 See `.env.example`, `server/.env.example` and `client/.env.example`.
@@ -100,8 +101,8 @@ locally, and re-check the vendors' free-tier limits at deploy time; they change.
 ## Phases
 
 - **Phase 0:** Design & feasibility — done (`docs/phase-0-design-feasibility.md`).
-- **Phase 1:** Deployable skeleton — this repo state.
-- **Phase 2:** Auth & ownership.
+- **Phase 1:** Deployable skeleton — done.
+- **Phase 2:** Auth & ownership — this repo state.
 - **Phase 3:** Courses, notes & tasks.
 - **Phase 4:** Quiz, flashcards & Pomodoro.
 - **Phase 5:** GPA, analytics, settings & admin.
