@@ -6,6 +6,9 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Profile from './pages/Profile.jsx';
+import Courses from './pages/Courses.jsx';
+import Notes from './pages/Notes.jsx';
+import Planner from './pages/Planner.jsx';
 
 function NotFound() {
   return (
@@ -27,6 +30,9 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/planner" element={<Planner />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
