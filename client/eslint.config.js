@@ -22,6 +22,9 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
+      // No prop-types anywhere in this project (no TypeScript either);
+      // prop validation is done by the code, not by prop-types.
+      'react/prop-types': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     },
