@@ -12,7 +12,7 @@
     "morgan": "^1.10.0",
     "zod": "^4.6.7"
   },
-  "description": "StudyMind backend — Express API (Phase 5: GPA, analytics, settings, admin)",
+  "description": "StudyMind backend — Express API (Phase 6: polish & QA — final phase)",
   "engines": {
     "node": ">=20"
   },
@@ -23,10 +23,10 @@
     "dev": "node --watch src/index.js",
     "lint": "node --check src/index.js && node --check src/app.js && node --check src/db.js && node --check src/auth.js && node --check src/srs.js && node --check src/gpa.js && node --check src/models/User.js && node --check src/models/Course.js && node --check src/models/Note.js && node --check src/models/Task.js && node --check src/models/Quiz.js && node --check src/models/QuizAttempt.js && node --check src/models/FlashcardDeck.js && node --check src/models/Flashcard.js && node --check src/models/FlashcardReview.js && node --check src/models/StudySession.js && node --check src/models/GpaRecord.js && node --check src/models/CuratedSubject.js && node --check src/middleware/auth.js && node --check src/routes/auth.js && node --check src/routes/common.js && node --check src/routes/courses.js && node --check src/routes/notes.js && node --check src/routes/tasks.js && node --check src/routes/dashboard.js && node --check src/routes/quizzes.js && node --check src/routes/flashcards.js && node --check src/routes/study-sessions.js && node --check src/routes/gpa.js && node --check src/routes/analytics.js && node --check src/routes/settings.js && node --check src/routes/admin.js && node --check scripts/promote-admin.js && node --check scripts/seed-samples.js",
     "start": "node src/index.js",
-    "test": "node --test --test-concurrency=1 test/health.test.js test/auth.test.js test/phase3.test.js test/phase4.test.js test/phase5.test.js"
+    "test": "node --test --test-concurrency=1 test/health.test.js test/auth.test.js test/phase3.test.js test/phase4.test.js test/phase5.test.js test/phase6.test.js"
   },
   "type": "module",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "devDependencies": {
     "mongodb-memory-server": "^11.3.0"
   }
