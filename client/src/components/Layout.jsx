@@ -42,7 +42,7 @@ function ThemeToggle({ user }) {
       type="button"
       onClick={toggle}
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+      className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
     >
       {dark ? '☀️ Light' : '🌙 Dark'}
     </button>
@@ -50,7 +50,7 @@ function ThemeToggle({ user }) {
 }
 
 function navClass({ isActive }) {
-  return `rounded-lg px-3 py-1.5 text-sm font-medium ${
+  return `shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium ${
     isActive
       ? 'bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-white'
       : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
@@ -104,10 +104,13 @@ export default function Layout() {
       {/* Topbar */}
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="text-xl font-bold text-brand-600 dark:text-brand-100">
+          <Link to="/" className="shrink-0 text-xl font-bold text-brand-600 dark:text-brand-100">
             📚 StudyMind
           </Link>
-          <nav aria-label="Main navigation" className="hidden items-center gap-1 sm:flex">
+          {/* Topbar nav scrolls horizontally instead of overflowing: with 13
+              links it is wider than the max-w-6xl container at 1280px, which
+              used to push the theme toggle 20px past the viewport edge. */}
+          <nav aria-label="Main navigation" className="no-scrollbar hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto sm:flex">
             {NAV.map((item) => (
               <NavLink key={item.to} to={item.to} className={navClass}>
                 {item.label}
@@ -117,7 +120,7 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Log out
               </button>
@@ -148,7 +151,7 @@ export default function Layout() {
                 </button>
               )}
               <p className="px-2 pt-4 text-xs leading-relaxed text-slate-400">
-                GPA, analytics, settings and admin arrived in Phase 5.
+                All six phases are built: courses, notes, planner, quizzes, flashcards, Pomodoro, GPA, analytics, settings and admin.
               </p>
             </nav>
           </aside>
@@ -159,17 +162,19 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* Mobile bottom navigation */}
+      {/* Mobile bottom navigation — horizontally scrollable: there are 13
+          links when logged in, and a fixed row would overflow a phone screen
+          (390px). Scrolling keeps every page reachable without overflow. */}
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-0 bottom-0 z-10 flex justify-around border-t border-slate-200 bg-white py-2 dark:border-slate-800 dark:bg-slate-900 md:hidden"
+        className="no-scrollbar fixed inset-x-0 bottom-0 z-10 flex overflow-x-auto border-t border-slate-200 bg-white py-2 dark:border-slate-800 dark:bg-slate-900 md:hidden"
       >
         {NAV.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `rounded-lg px-3 py-1 text-sm font-medium ${isActive ? 'text-brand-600 dark:text-brand-100' : 'text-slate-500 dark:text-slate-400'}`
+              `shrink-0 whitespace-nowrap rounded-lg px-3 py-1 text-sm font-medium ${isActive ? 'text-brand-600 dark:text-brand-100' : 'text-slate-500 dark:text-slate-400'}`
             }
           >
             {item.label}
