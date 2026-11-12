@@ -70,9 +70,22 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  const refresh = useCallback(async () => {
+    // Re-read the logged-in user from the server (used after a Settings
+    // save so Profile/Layout show the new theme/timezone without a reload).
+    try {
+      const data = await authFetch('/me');
+      setUser(data.user);
+      return data.user;
+    } catch {
+      setUser(null);
+      return null;
+    }
+  }, []);
+
   const value = useMemo(
-    () => ({ user, loading, error, setError, login, register, logout, changePassword }),
-    [user, loading, error, login, register, logout, changePassword],
+    () => ({ user, loading, error, setError, login, register, logout, changePassword, refresh }),
+    [user, loading, error, login, register, logout, changePassword, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
