@@ -96,3 +96,55 @@ export const studySessionsApi = {
   abandon: (id) => apiFetch(`/study-sessions/${id}/abandon`, { method: 'POST', body: {} }),
   summary: () => apiFetch('/study-sessions/summary'),
 };
+
+export const gpaApi = {
+  list: (params) => apiFetch(`/gpa-records${query(params)}`),
+  get: (id) => apiFetch(`/gpa-records/${id}`),
+  create: (body) => apiFetch('/gpa-records', { method: 'POST', body }),
+  update: (id, body) => apiFetch(`/gpa-records/${id}`, { method: 'PUT', body }),
+  remove: (id) => apiFetch(`/gpa-records/${id}`, { method: 'DELETE' }),
+  compute: () => apiFetch('/gpa-records/compute'),
+};
+
+export const analyticsApi = {
+  overview: (params) => apiFetch(`/analytics/overview${query(params)}`),
+};
+
+export const settingsApi = {
+  update: (body) => apiFetch('/settings', { method: 'PATCH', body }),
+  deleteAccount: (body) => apiFetch('/settings/account', { method: 'DELETE', body }),
+};
+
+// Export downloads a file, not JSON — fetch the blob and trigger a download.
+export async function downloadExport(format) {
+  const res = await fetch(`${API_BASE}/api/v1/settings/export?format=${format}`, {
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error || `Export failed (HTTP ${res.status}).`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `studymind-export-${new Date().toISOString().slice(0, 10)}.${format}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+export const adminApi = {
+  stats: () => apiFetch('/admin/stats'),
+  listSubjects: (params) => apiFetch(`/admin/subjects${query(params)}`),
+  createSubject: (body) => apiFetch('/admin/subjects', { method: 'POST', body }),
+  updateSubject: (id, body) => apiFetch(`/admin/subjects/${id}`, { method: 'PUT', body }),
+  removeSubject: (id) => apiFetch(`/admin/subjects/${id}`, { method: 'DELETE' }),
+  listSamples: (params) => apiFetch(`/admin/sample-quizzes${query(params)}`),
+  getSample: (id) => apiFetch(`/admin/sample-quizzes/${id}`),
+  createSample: (body) => apiFetch('/admin/sample-quizzes', { method: 'POST', body }),
+  updateSample: (id, body) => apiFetch(`/admin/sample-quizzes/${id}`, { method: 'PUT', body }),
+  removeSample: (id) => apiFetch(`/admin/sample-quizzes/${id}`, { method: 'DELETE' }),
+  copySample: (id) => apiFetch(`/admin/sample-quizzes/${id}/copy`, { method: 'POST', body: {} }),
+};
