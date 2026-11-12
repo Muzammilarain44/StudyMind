@@ -1,14 +1,17 @@
-# StudyMind — Architecture (Phase 4)
+# StudyMind — Architecture (Phase 5)
 
 ## Overview
 
 Two separate apps, one repo:
 
-- `client/` — Vite + React 18 SPA. React Router for pages, Tailwind CSS for styling.
-  Talks to the backend through `/api` (Vite dev proxy) or `VITE_API_URL` in production.
+- `client/` — Vite + React 18 SPA. React Router for pages, Tailwind CSS for styling,
+  Recharts for analytics charts (code-split: the charts chunk loads only on the
+  Analytics page). Talks to the backend through `/api` (Vite dev proxy) or
+  `VITE_API_URL` in production.
 - `server/` — Express 4 API. Mongoose for MongoDB. Auth (Phase 2), courses,
-  notes, tasks and a real dashboard endpoint (Phase 3), plus quizzes,
-  flashcards and Pomodoro sessions (Phase 4).
+  notes, tasks and a real dashboard endpoint (Phase 3), quizzes, flashcards
+  and Pomodoro sessions (Phase 4), plus GPA, analytics, settings and admin
+  (Phase 5).
 
 ## Request flow (dev)
 
@@ -47,8 +50,9 @@ Browser (http://localhost:5173)
 
 Mongoose models so far: `User` (Phase 2), `Course`, `Note`, `Task` (Phase 3),
 `Quiz`, `QuizAttempt`, `FlashcardDeck`, `Flashcard`, `FlashcardReview`,
-`StudySession` (Phase 4). See `docs/phase-0-design-feasibility.md` §5 for the
-full Phase 0 schema (gpaRecords and the rest arrive with their phases). Notes
+`StudySession` (Phase 4), `GpaRecord`, `CuratedSubject` (Phase 5). `Quiz` has
+an `isSample` flag for platform sample quizzes. See
+`docs/phase-0-design-feasibility.md` §5 for the full Phase 0 schema. Notes
 render Markdown in the browser with `marked` + `DOMPurify` — raw user HTML is
 never injected unsanitized.
 
@@ -115,3 +119,64 @@ Per the Phase 0 definition, a day counts when the user completed at least
 computes consecutive active days back from today (if today has no activity
 yet, the streak is counted from yesterday — it is still alive). Break
 sessions do not count toward the streak.
+
+## GPA and grading scales (Phase 5)
+
+- A `GpaRecord` is one saved grade: a title, a semester, a letter grade
+  (`A`–`F`) and credit hours. Credit hours come from the record itself or
+  are copied from a linked course at creation; a grade with no credits is
+  rejected (400) because it cannot be weighted.
+- The grade→points map lives on the user (`User.gradingScale`, default 4.0:
+  A 4.0, A- 3.7, B+ 3.3, B 3.0, B- 2.7, C+ 2.3, C 2.0, D 1.0, F 0).
+  Users edit their own scale in Settings / on the GPA page; the scale is
+  validated (letters A–F only, points 0–5) and merged, never replaced wholesale.
+- `GET /gpa-records/compute` runs `computeGpa()` (`server/src/gpa.js`):
+  credit-weighted average over the user's records, plus a per-semester
+  breakdown. The response is always labelled `estimate: true` — universities
+  use different scales and policies, and StudyMind never claims an official GPA.
+
+## Analytics (Phase 5)
+
+- `GET /analytics/overview` aggregates the user's own stored data only:
+  completed focus sessions, completed tasks and quiz attempts. Default range
+  is the last 30 days ending today (`?from`/`?to`, max 366 days).
+- The response has totals, one daily entry per day in the range (zero-filled),
+  and a per-course breakdown. Focus sessions carry no course, so they appear
+  in totals/daily only. An empty range returns zeros — the client shows an
+  honest empty state, never invented numbers.
+- Charts use Recharts on the client. The Analytics page is lazy-loaded
+  (`React.lazy` in `App.jsx`) so the charts chunk (~419 kB) does not bloat
+  the main bundle.
+
+## Settings (Phase 5)
+
+- `PATCH /settings` updates theme (`light`/`dark`), timezone (validated
+  against the platform's IANA list when available) and the grading scale.
+  The theme is applied to the document immediately and stored in
+  `localStorage` (`client/src/lib/theme.js`); the topbar toggle also persists
+  it to the server when logged in, and adopts the server value on login.
+- `GET /settings/export?format=json|csv` returns every document the user
+  owns, as a file download. CSV has one `## Section` per collection.
+- `DELETE /settings/account` verifies the password, then deletes the user and
+  every owned document (courses, notes, tasks, quizzes, attempts, decks,
+  cards, reviews, sessions, GPA records) and clears the cookie. Platform
+  content — curated subjects and sample quizzes — is kept, because other
+  users rely on it.
+
+## Admin authorization and sample content (Phase 5)
+
+- The `User.role` field is `student` or `admin` (default `student`). Admin
+  routes use `requireRole('admin')` after `requireAuth`; the role is read
+  from the database on every request, never trusted from the client or the
+  JWT payload alone.
+- There is **no open admin self-registration**. The only promotion path is
+  the command-line script (see `docs/setup.md`):
+  `node scripts/promote-admin.js <email>`, which sets `role: 'admin'` for an
+  existing user. Run it with `MONGODB_URI` set (from `server/.env`).
+- Admins manage curated subjects (`CuratedSubject`) and sample quiz banks
+  (`Quiz` rows with `isSample: true`) and see aggregate usage counts only
+  (`GET /admin/stats`) — counts, never private student content.
+- Students browse curated subjects and sample quizzes (answers hidden) and
+  copy a sample into their own quizzes (`POST /admin/sample-quizzes/:id/copy`).
+- `scripts/seed-samples.js <admin-email>` seeds 5 curated CS subjects and 2
+  sample quizzes. It is idempotent: re-running it creates nothing new.

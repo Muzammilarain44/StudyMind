@@ -1,4 +1,4 @@
-# StudyMind — Setup (Phase 3)
+# StudyMind — Setup (Phase 5)
 
 ## Prerequisites
 
@@ -26,8 +26,9 @@ npm run dev                 # http://localhost:5173
 ```
 
 Open http://localhost:5173 — Home, Login, Register and Dashboard should all load.
-After logging in, Courses, Notes and Planner are available; the Dashboard shows
-real metrics calculated from your own data.
+After logging in, Courses, Notes, Planner, Quizzes, Flashcards, Pomodoro, GPA,
+Analytics and Settings are available; the Dashboard shows real metrics
+calculated from your own data.
 
 ## Environment variables
 
@@ -44,7 +45,30 @@ Copy the `.env.example` files and fill in your own values. Never commit a real `
 Auth, courses, notes and tasks all need a database: they return 503 while
 MongoDB is down. For local testing without Atlas, the server test suite uses
 an in-memory MongoDB (`mongodb-memory-server`, dev-only) — see
-`server/test/phase3.test.js`. Phase 3 adds no new environment variables.
+`server/test/phase5.test.js`. Phase 5 adds no new environment variables.
+
+## Admin access and sample content (Phase 5)
+
+There is **no admin self-registration**. To make a user an admin, they must
+register first, then run (from `server/`, with `MONGODB_URI` in `server/.env`
+or the environment):
+
+```bash
+cd server
+node scripts/promote-admin.js admin@example.com
+```
+
+To seed the platform sample content (5 curated CS subjects and 2 sample quiz
+banks, owned by that admin), run:
+
+```bash
+node scripts/seed-samples.js admin@example.com
+```
+
+The seed script is idempotent — running it again creates nothing new. Admins
+manage subjects and samples from the Admin page (visible in the nav only for
+admins); students can browse samples there and copy them into their own
+quizzes.
 
 ## Deployment (manual steps — no live deployment exists yet)
 

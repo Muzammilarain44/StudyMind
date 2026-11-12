@@ -1,4 +1,4 @@
-# StudyMind — API Contract (Phase 4)
+# StudyMind — API Contract (Phase 5)
 
 Base prefix for versioned endpoints: `/api/v1`. The health endpoint is also
 available unversioned at `/api/health` for deployment checks.
@@ -241,11 +241,107 @@ Session: `{ "_id", "userId", "type" ("focus" | "break"), "plannedMinutes" (1–2
 - `POST /api/v1/study-sessions/:id/abandon` — **200** `{ "session" }`. Only an
   active session can be abandoned (otherwise **409**).
 
+## GPA, analytics, settings, admin — `/api/v1/*` (Phase 5, real)
+
+Same auth (401 without a valid session) and ownership rules as Phase 3:
+another user's document behaves as if it does not exist (**404**). All routes
+return **503** when MongoDB is down. List endpoints are paginated as above.
+
+### GPA records — `/api/v1/gpa-records`
+
+GPA record: `{ "_id", "userId", "courseId" (nullable), "title" (≤120),
+"semester" (≤60, optional), "grade" ("A" | "A-" | "B+" | "B" | "B-" | "C+" |
+"C" | "D" | "F"), "creditHours" (0–12, required), "createdAt", "updatedAt" }`.
+
+- `GET /api/v1/gpa-records` — `?semester`, `?search` (title substring).
+- `POST /api/v1/gpa-records` — **201** `{ "record" }`. Credit hours are
+  required: either send `creditHours`, or link a `courseId` whose course has
+  credit hours (they are copied onto the record). No credits available → 400.
+  Another user's `courseId` → 400.
+- `GET /api/v1/gpa-records/compute` — **200** `{ "gpa", "totalCredits",
+  "totalPoints", "bySemester": [{ "semester", "gpa", "totalCredits",
+  "records" }], "recordCount", "scale", "estimate": true, "note" }`.
+  Credit-weighted GPA computed server-side from the user's own records with
+  the user's own grading scale (default 4.0). `gpa` is `null` when there are
+  no credited records. The result is always labelled an estimate — grading
+  scales and policies differ by university.
+- `GET /api/v1/gpa-records/:id` — **200** `{ "record" }`, else 404.
+- `PUT /api/v1/gpa-records/:id` — partial update; credits re-resolve when the
+  course link changes. **200** `{ "record" }`.
+- `DELETE /api/v1/gpa-records/:id` — **200** `{ "ok": true }`.
+
+### Analytics — `/api/v1/analytics/overview`
+
+`GET /api/v1/analytics/overview?from=YYYY-MM-DD&to=YYYY-MM-DD` — **200**,
+all numbers calculated from the logged-in user's own stored data only
+(completed focus sessions, completed tasks, quiz attempts). Default range:
+last 30 days ending today; max range 366 days; `from` after `to` → 400;
+bad date → 400.
+
+```json
+{
+  "from": "2026-10-14", "to": "2026-11-12",
+  "totals": { "totalFocusMinutes": 25, "completedFocusSessions": 1,
+    "tasksCompleted": 1, "totalQuizAttempts": 1, "averageQuizPercentage": 50,
+    "bestQuizPercentage": 50 },
+  "daily": [{ "date": "2026-11-12", "focusMinutes": 25, "tasksCompleted": 1,
+    "quizAttempts": 1, "averageQuizPercentage": 50 }],
+  "byCourse": [{ "courseId", "courseTitle", "tasksCompleted": 1, "quizzes": 1,
+    "quizAttempts": 1, "averageQuizPercentage": 50 }]
+}
+```
+
+`daily` has one entry per day in the range, even with no activity.
+Averages are `null` when there are no attempts. An empty range returns zeros
+and empty series — never invented numbers.
+
+### Settings — `/api/v1/settings`
+
+- `PATCH /api/v1/settings` — body `{ "theme" ("light" | "dark"), "timezone"
+  (IANA name, e.g. "Asia/Karachi"), "gradingScale" (partial map of letter →
+  points, 0–5) }`. Partial update; the grading scale is merged with the
+  existing one. **200** `{ "user": {...} }`. Bad theme/timezone/scale → 400.
+- `GET /api/v1/settings/export?format=json|csv` — **200**, downloads ALL of
+  the requesting user's own data (courses, notes, tasks, quizzes, quiz
+  attempts, flashcard decks/cards/reviews, study sessions, GPA records) as a
+  file attachment. JSON is one object; CSV has one `## Section` per
+  collection. Never includes another user's data.
+- `DELETE /api/v1/settings/account` — body `{ "password" }`. Verifies the
+  password (wrong → 401), then deletes the user and ALL of their owned data
+  and clears the auth cookie. Platform content (curated subjects and sample
+  quizzes) is not deleted. **200** `{ "ok": true }`.
+
+### Admin — `/api/v1/admin/*`
+
+All admin routes require the auth cookie. Write routes and `/stats` require
+the server-side `admin` role (**403** for students). There is no open admin
+self-registration — see `docs/setup.md` for the promotion script.
+
+- `GET /api/v1/admin/stats` — **200** counts only: `{ "users", "courses",
+  "notes", "tasks", "quizzes", "quizAttempts", "flashcardDecks", "flashcards",
+  "studySessions", "gpaRecords", "curatedSubjects" }`. No private content.
+- `GET /api/v1/admin/subjects` — any logged-in user; `?search`, `?category`.
+- `POST /api/v1/admin/subjects` — admin only. **201** `{ "subject" }`.
+  Subject: `{ "_id", "title" (≤120), "code" (≤20, optional), "description"
+  (≤500, optional), "category" (≤60, default "Computer Science"),
+  "createdBy", "createdAt", "updatedAt" }`.
+- `GET /api/v1/admin/subjects/:id` — any logged-in user. **200** `{ "subject" }`.
+- `PUT /api/v1/admin/subjects/:id` — admin only. `DELETE` — admin only.
+- `GET /api/v1/admin/sample-quizzes` — any logged-in user. Sample quizzes
+  are returned WITHOUT correct answers (questions have `question` + `options`
+  only) and with `questionCount`.
+- `POST /api/v1/admin/sample-quizzes` — admin only. Same validation as
+  creating a quiz. **201** `{ "quiz" }` (`isSample: true`).
+- `GET /api/v1/admin/sample-quizzes/:id` — any logged-in user, answers hidden.
+- `PUT /api/v1/admin/sample-quizzes/:id` — admin only. `DELETE` — admin only.
+- `POST /api/v1/admin/sample-quizzes/:id/copy` — any logged-in user. Copies
+  the sample into the student's own quizzes (`isSample: false`). **201**
+  `{ "quiz" }`.
+
 ## Unknown routes
 
 `GET /api/<anything-else>` → HTTP 404, `{ "error": "Not found" }`.
 
-## Future endpoints (Phases 5–6, not implemented)
+## Future endpoints (Phase 6, not implemented)
 
-See `docs/phase-0-design-feasibility.md` §7 for the remaining endpoint plan
-(`/gpa-records`, `/analytics/overview`, `/admin/subjects`).
+Phase 6 adds no new endpoints — it is polish and QA on the deployed app.
