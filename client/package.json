@@ -4,9 +4,10 @@
     "marked": "^18.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "recharts": "^3.10.1"
   },
-  "description": "StudyMind frontend — Vite + React (Phase 4: quizzes, flashcards, Pomodoro)",
+  "description": "StudyMind frontend — Vite + React (Phase 5: GPA, analytics, settings, admin)",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@vitejs/plugin-react": "^4.3.4",
@@ -29,5 +30,5 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
