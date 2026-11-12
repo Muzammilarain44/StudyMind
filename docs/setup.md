@@ -1,4 +1,4 @@
-# StudyMind — Setup (Phase 1)
+# StudyMind — Setup (Phase 2)
 
 ## Prerequisites
 
@@ -37,7 +37,12 @@ Copy the `.env.example` files and fill in your own values. Never commit a real `
 | `server/.env` | `PORT` | Backend port (default 5000) |
 | `server/.env` | `MONGODB_URI` | Atlas connection string (leave unset to run without a DB) |
 | `server/.env` | `CORS_ORIGIN` | Allowed frontend origin(s), comma-separated (default `http://localhost:5173`) |
+| `server/.env` | `JWT_SECRET` | Long random secret for auth cookies (≥ 32 chars). Generate one: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Production refuses to start without it; dev uses a warned dev-only default. Never commit a real value. |
 | `client/.env` | `VITE_API_URL` | Backend URL in production; leave unset in dev (Vite proxy) |
+
+Auth needs a database: register/login return 503 while MongoDB is down.
+For local testing without Atlas, the server test suite uses an in-memory
+MongoDB (`mongodb-memory-server`, dev-only) — see `server/test/auth.test.js`.
 
 ## Deployment (manual steps — do not deploy until Phase 1 is verified)
 
@@ -53,8 +58,9 @@ Copy the `.env.example` files and fill in your own values. Never commit a real `
 
 1. New → Web Service → connect the GitHub repo, root directory `server`.
 2. Build command: `npm install`. Start command: `npm start`.
-3. Environment: `PORT` is set by Render; add `MONGODB_URI` and
-   `CORS_ORIGIN=https://<your-vercel-app>.vercel.app`.
+3. Environment: `PORT` is set by Render; add `MONGODB_URI`,
+   `CORS_ORIGIN=https://<your-vercel-app>.vercel.app` and a generated
+   `JWT_SECRET` (long random string — without it the server exits in production).
 4. Free tier sleeps after 15 minutes idle and takes ~1 minute to wake — expected.
 5. Verify: `curl https://<your-render-app>.onrender.com/api/health` → 200 + `db: "connected"`.
 
